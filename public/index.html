@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrustLink Waitlist API</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #FF6B35;
+            --secondary: #004E89;
+            --accent: #F7B801;
+            --dark: #1A1A2E;
+            --light: #F8F9FA;
+            --success: #00D9A3;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+
+        /* Animated background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255, 107, 53, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 217, 163, 0.1) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(30px, -30px); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .subtitle {
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 400;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 12px 24px;
+            border-radius: 50px;
+            margin: 30px 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            animation: slideUp 0.8s ease-out 0.2s both;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: blink 2s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            animation: fadeIn 0.8s ease-out both;
+        }
+
+        .card:nth-child(1) { animation-delay: 0.3s; }
+        .card:nth-child(2) { animation-delay: 0.4s; }
+        .card:nth-child(3) { animation-delay: 0.5s; }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .card-icon.primary { background: linear-gradient(135deg, var(--primary), var(--accent)); }
+        .card-icon.secondary { background: linear-gradient(135deg, var(--secondary), #667eea); }
+        .card-icon.success { background: linear-gradient(135deg, var(--success), #00B894); }
+
+        .card h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+
+        .card p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .endpoints {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.8s ease-out 0.6s both;
+        }
+
+        .endpoints h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: var(--dark);
+        }
+
+        .endpoint {
+            background: #F8F9FA;
+            border-left: 4px solid var(--primary);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .endpoint:hover {
+            background: white;
+            transform: translateX(10px);
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.1);
+        }
+
+        .endpoint-method {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 10px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .endpoint-method.get { background: var(--secondary); }
+
+        .endpoint-path {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 16px;
+        }
+
+        .endpoint-desc {
+            color: #666;
+            margin-top: 8px;
+            font-size: 14px;
+        }
+
+        .code-block {
+            background: var(--dark);
+            color: #00D9A3;
+            padding: 30px;
+            border-radius: 16px;
+            margin-top: 30px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            overflow-x: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .code-block::before {
+            content: '$ terminal';
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 14px 28px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(255, 107, 53, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--secondary), #667eea);
+            box-shadow: 0 4px 20px rgba(0, 78, 137, 0.3);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 6px 30px rgba(0, 78, 137, 0.4);
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 60px;
+            padding: 30px;
+            color: rgba(255, 255, 255, 0.8);
+            animation: fadeIn 0.8s ease-out 0.8s both;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 32px; }
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">🎯</div>
+            </div>
+            <h1>TrustLink Waitlist</h1>
+            <p class="subtitle">Secure escrow for social commerce in Nigeria</p>
+            <div class="status-badge">
+                <span class="status-dot"></span>
+                <span style="font-weight: 600; color: var(--dark);">API Server Active</span>
+            </div>
+        </header>
+
+        <div class="grid">
+            <div class="card">
+                <div class="card-icon primary">📡</div>
+                <h2>Public API</h2>
+                <p>Accept waitlist sign-ups from vendors, buyers, and riders across Nigeria.</p>
+                <div class="actions">
+                    <a href="#endpoints" class="btn">View Endpoints</a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-icon secondary">📊</div>
+                <h2>Admin Dashboard</h2>
+                <p>Manage pre-launch sign-ups, view analytics, and export data.</p>
+                <div class="actions">
+                    <a href="/admin/waitlist" class="btn btn-secondary">Open Dashboard</a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-icon success">✅</div>
+                <h2>Ready to Deploy</h2>
+                <p>Production-ready API with PostgreSQL, validation, and admin controls.</p>
+                <div class="actions">
+                    <a href="/health" class="btn" style="background: linear-gradient(135deg, var(--success), #00B894);">Health Check</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="endpoints" id="endpoints">
+            <h2>📡 API Endpoints</h2>
+
+            <div class="endpoint">
+                <div>
+                    <span class="endpoint-method">POST</span>
+                    <span class="endpoint-path">/api/waitlist</span>
+                </div>
+                <div class="endpoint-desc">Join the waitlist (public, no auth required)</div>
+            </div>
+
+            <div class="endpoint">
+                <div>
+                    <span class="endpoint-method get">GET</span>
+                    <span class="endpoint-path">/api/admin/waitlist</span>
+                </div>
+                <div class="endpoint-desc">Get all entries (requires X-Admin-Key header)</div>
+            </div>
+
+            <div class="endpoint">
+                <div>
+                    <span class="endpoint-method get">GET</span>
+                    <span class="endpoint-path">/api/admin/waitlist/stats</span>
+                </div>
+                <div class="endpoint-desc">Get statistics (requires X-Admin-Key header)</div>
+            </div>
+
+            <div class="endpoint">
+                <div>
+                    <span class="endpoint-method get">GET</span>
+                    <span class="endpoint-path">/api/admin/waitlist/export</span>
+                </div>
+                <div class="endpoint-desc">Download CSV export (requires X-Admin-Key header)</div>
+            </div>
+
+            <div class="code-block">
+<span style="color: #FFB86C;"># Quick Test - Add a vendor to waitlist</span>
+curl -X POST http://localhost:3000/api/waitlist \
+  -H <span style="color: #F1FA8C;">"Content-Type: application/json"</span> \
+  -d <span style="color: #F1FA8C;">'{
+    "name": "Chioma Adebayo",
+    "email": "chioma@example.com",
+    "phone": "+2348012345678",
+    "actor_type": "vendor",
+    "city": "Lagos"
+  }'</span>
+            </div>
+        </div>
+
+        <footer>
+            <p style="font-size: 14px;">Built with ❤️ for TrustLink • Secure Escrow Platform</p>
+        </footer>
+    </div>
+</body>
+</html>

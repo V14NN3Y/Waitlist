@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrustLink Waitlist Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #FF6B35;
+            --secondary: #004E89;
+            --accent: #F7B801;
+            --dark: #1A1A2E;
+            --success: #00D9A3;
+            --vendor: #667eea;
+            --buyer: #00D9A3;
+            --rider: #FF6B35;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+
+        /* Animated gradient background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255, 107, 53, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 217, 163, 0.15) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(30px, -30px) rotate(5deg); }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Auth Form */
+        .auth-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .auth-form {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 50px 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 450px;
+            width: 100%;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .auth-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-logo-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.3);
+        }
+
+        .auth-form h2 {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .auth-form p {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--dark);
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #E5E7EB;
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: 'DM Sans', sans-serif;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.1);
+        }
+
+        .btn-auth {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
+        }
+
+        .btn-auth:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(255, 107, 53, 0.4);
+        }
+
+        .error {
+            background: #FEE2E2;
+            border-left: 4px solid #EF4444;
+            color: #991B1B;
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 14px;
+            display: none;
+        }
+
+        /* Dashboard */
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 30px 40px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            animation: slideDown 0.6s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header-left h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 5px;
+        }
+
+        .header-left p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .header-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--success), #00B894);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 217, 163, 0.3);
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.2); }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            animation: fadeIn 0.6s ease-out both;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        .stat-card.vendor::before { background: linear-gradient(90deg, var(--vendor), #764ba2); }
+        .stat-card.buyer::before { background: linear-gradient(90deg, var(--buyer), #00B894); }
+        .stat-card.rider::before { background: linear-gradient(90deg, var(--rider), var(--accent)); }
+        .stat-card.total::before { background: linear-gradient(90deg, var(--secondary), #667eea); }
+
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .stat-icon.vendor { background: linear-gradient(135deg, var(--vendor), #764ba2); }
+        .stat-icon.buyer { background: linear-gradient(135deg, var(--buyer), #00B894); }
+        .stat-icon.rider { background: linear-gradient(135deg, var(--rider), var(--accent)); }
+        .stat-icon.total { background: linear-gradient(135deg, var(--secondary), #667eea); }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 42px;
+            font-weight: 700;
+            color: var(--dark);
+            line-height: 1;
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 25px 30px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+            animation: fadeIn 0.6s ease-out 0.5s both;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        select {
+            padding: 10px 15px;
+            border: 2px solid #E5E7EB;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'DM Sans', sans-serif;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 150px;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(255, 107, 53, 0.4);
+        }
+
+        .btn-secondary {
+            background: #F3F4F6;
+            color: var(--dark);
+        }
+
+        .btn-secondary:hover {
+            background: #E5E7EB;
+        }
+
+        .data-table {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            animation: fadeIn 0.6s ease-out 0.6s both;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #F8F9FA, #E9ECEF);
+        }
+
+        th {
+            text-align: left;
+            padding: 20px;
+            font-weight: 700;
+            color: var(--dark);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 20px;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        tbody tr:hover {
+            background: #F8F9FA;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge.vendor { 
+            background: rgba(102, 126, 234, 0.1); 
+            color: var(--vendor);
+        }
+        .badge.buyer { 
+            background: rgba(0, 217, 163, 0.1); 
+            color: var(--buyer);
+        }
+        .badge.rider { 
+            background: rgba(255, 107, 53, 0.1); 
+            color: var(--rider);
+        }
+
+        .notified-yes { 
+            color: var(--success); 
+            font-weight: 600;
+        }
+        .notified-no { 
+            color: #9CA3AF;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #9CA3AF;
+            font-size: 16px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .empty-text {
+            font-size: 18px;
+            color: #9CA3AF;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            table {
+                font-size: 13px;
+            }
+            
+            th, td {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth Form -->
+    <div id="authWrapper" class="auth-wrapper">
+        <div class="auth-form">
+            <div class="auth-logo">
+                <div class="auth-logo-icon">🔐</div>
+                <h2>Admin Access</h2>
+                <p>Enter your admin key to continue</p>
+            </div>
+            
+            <div class="form-group">
+                <label for="adminKey">Admin Key</label>
+                <input type="password" id="adminKey" placeholder="Enter your admin key" />
+            </div>
+            
+            <button class="btn-auth" onclick="authenticate()">Access Dashboard</button>
+            
+            <div id="authError" class="error"></div>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" style="display: none;">
+        <div class="container">
+            <header>
+                <div class="header-content">
+                    <div class="header-left">
+                        <h1>
+                            <span>🎯</span> TrustLink Waitlist
+                        </h1>
+                        <p>Pre-launch sign-up management</p>
+                    </div>
+                    <div class="header-badge">
+                        <span class="pulse-dot"></span>
+                        <span>Live Dashboard</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="stats-grid">
+                <div class="stat-card total">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-label">Total Sign-ups</div>
+                        </div>
+                        <div class="stat-icon total">📊</div>
+                    </div>
+                    <div class="stat-value" id="totalCount">-</div>
+                </div>
+                
+                <div class="stat-card vendor">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-label">Vendors</div>
+                        </div>
+                        <div class="stat-icon vendor">🏪</div>
+                    </div>
+                    <div class="stat-value" id="vendorCount">-</div>
+                </div>
+                
+                <div class="stat-card buyer">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-label">Buyers</div>
+                        </div>
+                        <div class="stat-icon buyer">🛍️</div>
+                    </div>
+                    <div class="stat-value" id="buyerCount">-</div>
+                </div>
+                
+                <div class="stat-card rider">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-label">Riders</div>
+                        </div>
+                        <div class="stat-icon rider">🏍️</div>
+                    </div>
+                    <div class="stat-value" id="riderCount">-</div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <div class="control-group">
+                    <label>Filter by type</label>
+                    <select id="actorFilter" onchange="loadWaitlist()">
+                        <option value="">All Types</option>
+                        <option value="vendor">Vendors</option>
+                        <option value="buyer">Buyers</option>
+                        <option value="rider">Riders</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label>Notified</label>
+                    <select id="notifiedFilter" onchange="loadWaitlist()">
+                        <option value="">All</option>
+                        <option value="true">Yes</option>
+                        <option value="false">No</option>
+                    </select>
+                </div>
+
+                <button class="btn btn-primary" onclick="loadWaitlist()" style="margin-top: 20px;">
+                    <span>🔄</span> Refresh
+                </button>
+                <button class="btn btn-secondary" onclick="exportCSV()" style="margin-top: 20px;">
+                    <span>📥</span> Export CSV
+                </button>
+            </div>
+
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Type</th>
+                            <th>City</th>
+                            <th>Joined</th>
+                            <th>Notified</th>
+                        </tr>
+                    </thead>
+                    <tbody id="waitlistTable">
+                        <tr>
+                            <td colspan="7" class="loading">Loading data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let adminKey = '';
+
+        function authenticate() {
+            const key = document.getElementById('adminKey').value;
+            const errorDiv = document.getElementById('authError');
+            
+            if (!key) {
+                errorDiv.textContent = 'Please enter your admin key';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            adminKey = key;
+            
+            fetch('/api/admin/waitlist/stats', {
+                headers: { 'X-Admin-Key': adminKey }
+            })
+            .then(res => {
+                if (res.ok) {
+                    document.getElementById('authWrapper').style.display = 'none';
+                    document.getElementById('dashboard').style.display = 'block';
+                    loadStats();
+                    loadWaitlist();
+                } else {
+                    errorDiv.textContent = 'Invalid admin key. Please try again.';
+                    errorDiv.style.display = 'block';
+                    adminKey = '';
+                }
+            })
+            .catch(err => {
+                errorDiv.textContent = 'Connection error. Please check the server.';
+                errorDiv.style.display = 'block';
+                console.error(err);
+            });
+        }
+
+        async function loadStats() {
+            try {
+                const res = await fetch('/api/admin/waitlist/stats', {
+                    headers: { 'X-Admin-Key': adminKey }
+                });
+                const data = await res.json();
+
+                document.getElementById('totalCount').textContent = data.total || 0;
+
+                const stats = data.by_actor_type || [];
+                const vendorStat = stats.find(s => s.actor_type === 'vendor');
+                const buyerStat = stats.find(s => s.actor_type === 'buyer');
+                const riderStat = stats.find(s => s.actor_type === 'rider');
+
+                document.getElementById('vendorCount').textContent = vendorStat ? vendorStat.total_count : 0;
+                document.getElementById('buyerCount').textContent = buyerStat ? buyerStat.total_count : 0;
+                document.getElementById('riderCount').textContent = riderStat ? riderStat.total_count : 0;
+
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        async function loadWaitlist() {
+            const actorType = document.getElementById('actorFilter').value;
+            const notified = document.getElementById('notifiedFilter').value;
+
+            const params = new URLSearchParams();
+            if (actorType) params.append('actor_type', actorType);
+            if (notified) params.append('notified', notified);
+
+            try {
+                const res = await fetch(`/api/admin/waitlist?${params}`, {
+                    headers: { 'X-Admin-Key': adminKey }
+                });
+                const data = await res.json();
+
+                const tbody = document.getElementById('waitlistTable');
+                
+                if (data.data.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7">
+                                <div class="empty-state">
+                                    <div class="empty-icon">📭</div>
+                                    <div class="empty-text">No entries found</div>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                tbody.innerHTML = data.data.map(entry => `
+                    <tr>
+                        <td style="font-weight: 600;">${entry.name}</td>
+                        <td style="font-family: 'JetBrains Mono', monospace; font-size: 13px;">${entry.email}</td>
+                        <td style="font-family: 'JetBrains Mono', monospace; font-size: 13px;">${entry.phone}</td>
+                        <td><span class="badge ${entry.actor_type}">${entry.actor_type}</span></td>
+                        <td>${entry.city || '—'}</td>
+                        <td>${new Date(entry.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
+                        <td class="${entry.notified ? 'notified-yes' : 'notified-no'}">
+                            ${entry.notified ? '✓ Yes' : 'No'}
+                        </td>
+                    </tr>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading waitlist:', error);
+                document.getElementById('waitlistTable').innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; color: #EF4444; padding: 40px;">
+                            Failed to load data. Please try again.
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        function exportCSV() {
+            const actorType = document.getElementById('actorFilter').value;
+            const params = actorType ? `?actor_type=${actorType}` : '';
+            window.location.href = `/api/admin/waitlist/export${params}`;
+        }
+
+        // Allow Enter key for auth
+        document.getElementById('adminKey')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') authenticate();
+        });
+    </script>
+</body>
+</html>
