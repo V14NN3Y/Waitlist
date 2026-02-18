@@ -27,6 +27,35 @@ pool.query('SELECT NOW()', (err, res) => {
 // Make pool available globally for routes
 global.pool = pool;
 
+// ===== CORS Configuration =====
+app.use((req, res, next) => {
+    // Allow requests from any origin in development, specific origins in production
+    const allowedOrigins = [
+        'http://localhost:3000',
+        'http://localhost:5173',
+        'http://localhost:5174',
+        'https://waitlist-mcud.onrender.com',
+        // Add your landing page domain here when deployed
+        // 'https://your-landing-page.com'
+    ];
+    
+    const origin = req.headers.origin;
+    if (allowedOrigins.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    }
+    
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Admin-Key');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    
+    // Handle preflight
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(200);
+    }
+    
+    next();
+});
+
 // ===== Middleware =====
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
