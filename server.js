@@ -34,6 +34,7 @@ app.use((req, res, next) => {
         'http://localhost:3000',
         'http://localhost:5173',
         'http://localhost:5174',
+        'http://10.50.12.43:3000',
         'https://waitlist-mcud.onrender.com',
         // Add your landing page domain here when deployed
         // 'https://your-landing-page.com'
